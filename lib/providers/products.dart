@@ -42,13 +42,13 @@ class Products with ChangeNotifier {
 
   List<Product> get items {
     // if (_showFavoritesOnly) {
-    //   return _items.where((prod) => prod.isFavorite).toList();
+    //   return _items.where((prodItem) => prodItem.isFavorite).toList();
     // }
     return [..._items];
   }
 
   List<Product> get favoriteItems {
-    return _items.where((prod) => prod.isFavorite).toList();
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
   Product findById(String id) {
