@@ -68,10 +68,10 @@ class Products with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     final url = Uri.https('sample-flutter-shop-app-default-rtdb.firebaseio.com',
         '/products.json');
-    http
+    return http
         .post(
       url,
       body: json.encode(
@@ -99,7 +99,7 @@ class Products with ChangeNotifier {
     });
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) {
     final prodIndex = items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
       _items[prodIndex] = newProduct;
@@ -107,6 +107,7 @@ class Products with ChangeNotifier {
     } else {
       print('...');
     }
+    return Future.value();
   }
 
   void deleteProduct(String id) {
