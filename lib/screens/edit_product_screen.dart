@@ -40,6 +40,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
+      if ((!_imageUrlController.text.startsWith('http://') &&
+              !_imageUrlController.text.startsWith('https://')) ||
+          (!_imageUrlController.text.endsWith('.jpg') &&
+              !_imageUrlController.text.endsWith('.jpeg') &&
+              !_imageUrlController.text.endsWith('.png'))) {
+        return;
+      }
       setState(() {});
     }
   }
@@ -104,10 +111,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 onFieldSubmitted: (value) {
                   FocusScope.of(context).requestFocus(_descriptionFocusNode);
                 },
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter price';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (double.parse(value) <= 0) {
+                    return 'Please enter a number greater than zero';
+                  }
+                  return null;
+                },
                 onSaved: (value) {
                   _editedProduct = Product(
                     title: _editedProduct.title,
-                    price: value.isNotEmpty ? double.parse(value) : 0,
+                    price: double.parse(value),
                     description: _editedProduct.description,
                     imageUrl: _editedProduct.imageUrl,
                     id: _editedProduct.id,
@@ -120,6 +139,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.multiline,
                 focusNode: _descriptionFocusNode,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please provide a description';
+                  }
+                  if (value.length < 10) {
+                    return 'Should be at least 10 characters long.';
+                  }
+                  return null;
+                },
                 onSaved: (value) {
                   _editedProduct = Product(
                     title: _editedProduct.title,
@@ -159,6 +187,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       },
                       onFieldSubmitted: (value) {
                         _saveForm();
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter an image URL';
+                        }
+                        if (!value.startsWith('http://') &&
+                            !value.startsWith('https://')) {
+                          return 'Please enter a valid URL.';
+                        }
+                        if (!value.endsWith('.jpg') &&
+                            !value.endsWith('.jpeg') &&
+                            !value.endsWith('.png')) {
+                          return 'Please enter a valid image URL.';
+                        }
+                        return null;
                       },
                       onSaved: (value) {
                         _editedProduct = Product(
