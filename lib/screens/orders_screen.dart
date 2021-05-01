@@ -13,36 +13,48 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var _isLoading = false;
+  Future _ordersFuture;
+
+  Future _obtainOrdersFuture() {
+    return Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
+  }
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) async {
-      setState(() {
-        _isLoading = true;
-      });
-      await Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    // 이 방식을 사용하면 rebuild 때문에 새로운 Future가 생성되지 않는다.
+    _ordersFuture = _obtainOrdersFuture();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final orderData = Provider.of<Orders>(context);
+    // final orderData = Provider.of<Orders>(context);
+    print('orders build');
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Orders'),
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: orderData.orders.length,
-              itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
-            ),
+      body: FutureBuilder(
+        future: _ordersFuture,
+        builder: (ctx, dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            if (dataSnapshot.error != null) {
+              // Do error handling stuff
+              return Center(child: Text('An error occrred!'));
+            } else {
+              return Consumer<Orders>(
+                builder: (ctx, orderData, child) => ListView.builder(
+                  itemCount: orderData.orders.length,
+                  itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
+                ),
+              );
+            }
+          }
+        },
+      ),
     );
   }
 }
