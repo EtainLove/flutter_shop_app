@@ -10,7 +10,7 @@ class Auth with ChangeNotifier {
   DateTime _expiryDate;
   String _userId;
 
-  bool get isAUth {
+  bool get isAuth {
     return token != null;
   }
 
@@ -21,6 +21,10 @@ class Auth with ChangeNotifier {
       return _token;
     }
     return null;
+  }
+
+  String get userId {
+    return _userId;
   }
 
   Future<void> _authenticate(
