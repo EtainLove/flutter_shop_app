@@ -15,6 +15,7 @@ import './screens/orders_screen.dart';
 import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/auth_screen.dart';
+import './helpers/custom_routes.dart';
 
 void main() async {
   await DotEnv.load(fileName: ".env");
@@ -52,6 +53,12 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.purple,
             accentColor: Colors.deepOrange,
             fontFamily: 'Lato',
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              },
+            ),
           ),
           home: auth.isAuth
               ? ProductsOverviewScreen()
