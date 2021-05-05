@@ -107,6 +107,8 @@ class _AuthCardState extends State<AuthCard>
   // var containerHeight = 260;
   AnimationController _controller; // 애니메이션을 시작하거나 멈출수 있는 컨트롤러
   Animation<Size> _heightAnimation; // 무거운 작업을 수행할 애니메이션 객체
+  Animation<double> _opacityAnimation;
+  Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -120,6 +122,24 @@ class _AuthCardState extends State<AuthCard>
     _heightAnimation = Tween<Size>(
       begin: Size(double.infinity, 260),
       end: Size(double.infinity, 320),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.fastOutSlowIn,
+      ),
+    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        curve: Curves.easeIn,
+        parent: _controller,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1.5),
+      end: Offset(0, 0),
     ).animate(
       CurvedAnimation(
         parent: _controller,
@@ -216,12 +236,12 @@ class _AuthCardState extends State<AuthCard>
       setState(() {
         _authMode = AuthMode.Signup;
       });
-      // _controller.forward(); // 애니매이션 재생
+      _controller.forward(); // 애니매이션 재생
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
-      // _controller.reverse(); // 애니매이션 리버스
+      _controller.reverse(); // 애니매이션 리버스
     }
   }
 
@@ -275,20 +295,35 @@ class _AuthCardState extends State<AuthCard>
                     _authData['password'] = value;
                   },
                 ),
-                if (_authMode == AuthMode.Signup)
-                  TextFormField(
-                    enabled: _authMode == AuthMode.Signup,
-                    decoration: InputDecoration(labelText: 'Confirm Password'),
-                    obscureText: true,
-                    validator: _authMode == AuthMode.Signup
-                        ? (value) {
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            }
-                            return null;
-                          }
-                        : null,
+                // if (_authMode == AuthMode.Signup)
+                AnimatedContainer(
+                  constraints: BoxConstraints(
+                    minHeight: _authMode == AuthMode.Signup ? 60.0 : 0.0,
+                    maxHeight: _authMode == AuthMode.Signup ? 120.0 : 0.0,
                   ),
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: TextFormField(
+                        enabled: _authMode == AuthMode.Signup,
+                        decoration:
+                            InputDecoration(labelText: 'Confirm Password'),
+                        obscureText: true,
+                        validator: _authMode == AuthMode.Signup
+                            ? (value) {
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match!';
+                                }
+                                return null;
+                              }
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(
                   height: 20,
                 ),
