@@ -216,12 +216,12 @@ class _AuthCardState extends State<AuthCard>
       setState(() {
         _authMode = AuthMode.Signup;
       });
-      _controller.forward(); // 애니매이션 재생
+      // _controller.forward(); // 애니매이션 재생
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
-      _controller.reverse(); // 애니매이션 리버스
+      // _controller.reverse(); // 애니매이션 리버스
     }
   }
 
@@ -233,16 +233,16 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: AnimatedBuilder(
-        animation: _heightAnimation,
-        builder: (ctx, ch) => Container(
-          // height: _authMode == AuthMode.Signup ? 320 : 260,
-          height: _heightAnimation.value.height,
-          constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
-          width: deviceSize.width * 0.75,
-          padding: EdgeInsets.all(16.0),
-          child: ch, // child는 리렌더링 하지 않는다.
+      child: AnimatedContainer(
+        duration: Duration(
+          milliseconds: 300,
         ),
+        height: _authMode == AuthMode.Signup ? 320 : 260,
+        // height: _heightAnimation.value.height,
+        constraints:
+            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
